@@ -32,3 +32,12 @@ body {
 .input1{
   width: 100%;
 }
+.Subheading{
+  font-size: 1.4em;
+  font-weight: bold;
+  line-height: 1;
+  display: inline-block;
+  margin: .25em;
+  padding: .5em .75em;
+  text-align: center;
+}

@@ -4,12 +4,13 @@
  */
 import React from "react";
 import {MDBContainer, MDBRow, MDBCol, MDBBtn, MDBCard, MDBCardBody, MDBIcon, MDBInput,
-MDBTable,MDBTableBody, MDBTableHead
+MDBTable,MDBTableBody, MDBTableHead,MDBListGroupItem
 } from 'mdbreact';
 import InnerNavBar from "./InnerNavBar";
 import SectionContainer from "../components/sectionContainer";
 import './style.css';
 import HSBar from "react-horizontal-stacked-bar-chart";
+import {addCalculation, getCalculation, getCalculations} from "./UserFunctions";
 const URI='http://localhost:5000/';
 const FormErrors = (props) =>
   <div className='formErrors'>
@@ -37,15 +38,19 @@ class Calculator extends React.Component {
         showResult:false,
         name:'',
         endBalances:[],
+        formValid:false,
         formErrors: {
           deposit: '', 
           price: '',
           term:'',
           interest:'',
-        }
+        },
+        previous:[],
       }
   }
-
+  validateForm=()=>{
+    this.setState({formValid: this.state.showResult});
+  }
   onChange=(e)=>{
     const name=e.target.name;
     const value=e.target.value;
@@ -59,9 +64,22 @@ class Calculator extends React.Component {
     const value=e.target.value;
     this.setState({
       [name]:value
-    });
+    },()=>{this.validateForm()});
   }
-  onSubmit=()=>{
+  onSubmit=(e)=>{
+    e.preventDefault();
+    var found=false;
+    for(var i=0; i<this.state.previous.length;i++){
+      if(this.state.previous[i]==this.state.name){
+        found=true;
+        break;
+      }
+    }
+    if(!found){
+      this.setState({
+        previous:[...this.state.previous,this.state.name]
+      })
+    }
     const obj={
       name:this.state.name,
     }
@@ -186,28 +204,42 @@ class Calculator extends React.Component {
       const bargraph=(
         <MDBCard>
         <MDBCardBody>
-          <HSBar
-          height={50}
-          showTextIn
-          showTextUp
-          showTextDown
-          id="new_id"
-          fontColor="rgb(50,20,100)"
-          data={[
-            {
-              name: "To pay",
-              value: 80,
-              description: "U$80,00",
-              color: "red"
-            },
-            {
-              name: "Paid",
-              value: 200,
-              description: "U$200,00",
-              color: "rgb(150,150,220)"
-            }
-          ]}
-        />
+          <div>
+          Interest %
+          <div style={{width:"20px", height:"20px", backgroundColor:"rgb(175, 33, 33)"}}></div><br/>
+          Capital%
+          <div style={{width:"20px", height:"20px", backgroundColor:"rgb(0, 0, 0)"}}></div> 
+          </div>
+        {
+          this.state.endBalances.map((value,index)=>{
+            const k=12;
+            return(
+              <>
+              <small>year {index+1}</small>
+              <HSBar
+              height={15}
+              showTextIn
+              id="new_id"
+              fontColor="white"
+              data={[
+                {
+                  name: "",
+                  value:Math.round((value*100/this.state.price-this.state.deposit)),
+                  description: "",
+                  color: "rgb(175, 33, 33)"
+                },
+                {
+                  name: "",
+                  value:Math.round(100-(value*100/this.state.price-this.state.deposit)),
+                  description: "",
+                  color: "rgb(0, 0, 0)"
+                }
+              ]}
+            />
+            </>
+            )
+          })
+        }
         </MDBCardBody>
         </MDBCard>
       )
@@ -219,12 +251,46 @@ class Calculator extends React.Component {
       return ""
     }
   }
+  prevtList=()=>{
+    return(
+      <>
+      <div className="Subheading">Previous Calculation By:</div>
+      <MDBCard>
+      <MDBCardBody>
+        {this.state.previous.map((name)=>{
+          return(
+              <MDBListGroupItem href="#" onClick={(e)=> this.displayPrevious(e, name)} style={{marginBottom:2, maxHeight:200}}>
+                <div className="d-flex w-100 justify-content-between">
+                  <h5 className="mb-1">{name}</h5>
+                </div>
+              </MDBListGroupItem>
+            )  
+       })}
+      </MDBCardBody>
+      </MDBCard>
+      </>
+    )
+  }
+  displayPrevious=(event,name)=>{
+    event.preventDefault();
+    // find name is database
+  }
+  componentWillMount(){
+    /*getCalculations()
+      .then(res=>{
+        if(res.found){
+          this.setState({
+            previous:[...res.payload.names.map(name=>name)]
+          })
+        }
+      })*/
+  }
   render() {
     return (
       <>
       <MDBContainer>
         <MDBRow>
-          <MDBCol md="5">
+          <MDBCol md="4">
             <MDBCard>
               <MDBCardBody>
               <form 
@@ -290,6 +356,11 @@ class Calculator extends React.Component {
           </MDBCol>
           <MDBCol>
             {this.visualize()}
+          </MDBCol>
+        </MDBRow>
+        <MDBRow>
+          <MDBCol>
+            {this.prevtList()}
           </MDBCol>
         </MDBRow>
       </MDBContainer>
