@@ -5,8 +5,10 @@
  */
 
 //import axios from 'axios';
-
-/*export const getCalculations = () => {
+/**
+ * get all previous calculations
+ */
+export const getCalculations = () => {
     return (
         axios.get('calc/')
             .then(res => {
@@ -18,6 +20,9 @@
     )
 
 }
+/**
+ * get a single previous calculation
+ */
 export const getCalculation = (name) => {
     return (
         axios.get(`calc/${name}`)
@@ -30,7 +35,9 @@ export const getCalculation = (name) => {
     )
 
 }
-
+/**
+ * add a calculation to db
+ */
 export const addCalculation = calculation => {
     return (
         axios.post('calc/add', {
@@ -47,4 +54,4 @@ export const addCalculation = calculation => {
                 return err;
             })
     )
-}*/
+}

@@ -10,7 +10,7 @@ import InnerNavBar from "./InnerNavBar";
 import SectionContainer from "../components/sectionContainer";
 import './style.css';
 import HSBar from "react-horizontal-stacked-bar-chart";
-//import {addCalculation, getCalculation, getCalculations} from "./UserFunctions";
+import {addCalculation, getCalculation, getCalculations} from "./UserFunctions";
 const URI='http://localhost:5000/';
 const FormErrors = (props) =>
   <div className='formErrors'>
